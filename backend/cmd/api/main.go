@@ -13,6 +13,7 @@ import (
 	"github.com/pasindu/web-page-analyser/internal/config"
 	"github.com/pasindu/web-page-analyser/internal/handler"
 	"github.com/pasindu/web-page-analyser/internal/logger"
+	"github.com/pasindu/web-page-analyser/internal/repository"
 	"github.com/pasindu/web-page-analyser/internal/service"
 )
 
@@ -20,7 +21,24 @@ func main() {
 	cfg := config.Load()
 	logger.Setup(cfg.LogLevel)
 
-	svc := service.New(cfg)
+	var repo repository.Repository
+	if cfg.MySQLDSN != "" {
+		mysqlRepo, err := repository.NewMySQL(cfg.MySQLDSN)
+		if err != nil {
+			slog.Error("failed to connect to MySQL", "error", err)
+			os.Exit(1)
+		}
+		defer mysqlRepo.Close()
+
+		if err := repository.RunMigrations(mysqlRepo.DB()); err != nil {
+			slog.Error("failed to run migrations", "error", err)
+			os.Exit(1)
+		}
+		slog.Info("MySQL persistence enabled")
+		repo = mysqlRepo
+	}
+
+	svc := service.New(cfg, repo)
 	h := handler.New(svc)
 
 	mux := http.NewServeMux()

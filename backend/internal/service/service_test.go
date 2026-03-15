@@ -20,7 +20,7 @@ func testConfig() *config.Config {
 }
 
 func TestAnalyze_ValidationErrors(t *testing.T) {
-	svc := New(testConfig())
+	svc := New(testConfig(), nil)
 
 	tests := []struct {
 		name string
@@ -67,7 +67,7 @@ func TestAnalyze_FullFlow(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	svc := New(testConfig())
+	svc := New(testConfig(), nil)
 	resp, err := svc.Analyze(context.Background(), srv.URL)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)

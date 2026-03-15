@@ -20,7 +20,7 @@ func setupHandler() (*Handler, *http.ServeMux) {
 		MaxLinksToCheck:     10,
 		LogLevel:            "info",
 	}
-	svc := service.New(cfg)
+	svc := service.New(cfg, nil)
 	h := New(svc)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
@@ -99,6 +99,24 @@ func TestHandleAnalyze_Success(t *testing.T) {
 	}
 	if resp.Headings.H1 != 1 {
 		t.Errorf("expected 1 h1, got %d", resp.Headings.H1)
+	}
+}
+
+func TestHandleListAnalyses_NoPersistence(t *testing.T) {
+	_, mux := setupHandler()
+
+	req := httptest.NewRequest(http.MethodGet, "/api/analyses", nil)
+	w := httptest.NewRecorder()
+	mux.ServeHTTP(w, req)
+
+	if w.Code != http.StatusServiceUnavailable {
+		t.Errorf("expected 503 when persistence not configured, got %d", w.Code)
+	}
+
+	var errResp model.ErrorResponse
+	json.NewDecoder(w.Body).Decode(&errResp)
+	if errResp.Message == "" {
+		t.Error("expected error message")
 	}
 }
 

@@ -3,23 +3,27 @@ package service
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net/url"
 
 	"github.com/pasindu/web-page-analyser/internal/analyzer"
 	"github.com/pasindu/web-page-analyser/internal/config"
 	"github.com/pasindu/web-page-analyser/internal/fetcher"
 	"github.com/pasindu/web-page-analyser/internal/model"
+	"github.com/pasindu/web-page-analyser/internal/repository"
 )
 
 type AnalyzeService struct {
 	fetcher     *fetcher.Fetcher
 	linkChecker *analyzer.LinkChecker
+	repo        repository.Repository
 }
 
-func New(cfg *config.Config) *AnalyzeService {
+func New(cfg *config.Config, repo repository.Repository) *AnalyzeService {
 	return &AnalyzeService{
 		fetcher:     fetcher.New(cfg.RequestTimeout),
 		linkChecker: analyzer.NewLinkChecker(cfg.MaxLinkCheckWorkers, cfg.MaxLinksToCheck, cfg.RequestTimeout),
+		repo:        repo,
 	}
 }
 
@@ -55,7 +59,7 @@ func (s *AnalyzeService) Analyze(ctx context.Context, rawURL string) (*model.Ana
 		}
 	}
 
-	return &model.AnalyzeResponse{
+	resp := &model.AnalyzeResponse{
 		URL:         rawURL,
 		HTMLVersion: analysis.HTMLVersion,
 		Title:       analysis.Title,
@@ -73,7 +77,23 @@ func (s *AnalyzeService) Analyze(ctx context.Context, rawURL string) (*model.Ana
 			Inaccessible: inaccessible,
 		},
 		HasLoginForm: analysis.HasLoginForm,
-	}, nil
+	}
+
+	if s.repo != nil {
+		if err := s.repo.Save(ctx, resp); err != nil {
+			slog.Error("failed to persist analysis", "error", err)
+		}
+	}
+
+	return resp, nil
+}
+
+// ListAnalyses returns stored analysis history. Returns nil, nil if persistence is not configured.
+func (s *AnalyzeService) ListAnalyses(ctx context.Context) ([]model.AnalyzeResponse, error) {
+	if s.repo == nil {
+		return nil, nil
+	}
+	return s.repo.List(ctx)
 }
 
 func validateURL(rawURL string) error {

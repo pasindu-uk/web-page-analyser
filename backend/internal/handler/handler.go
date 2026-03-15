@@ -21,6 +21,7 @@ func New(svc *service.AnalyzeService) *Handler {
 
 func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /api/analyze", h.handleAnalyze)
+	mux.HandleFunc("GET /api/analyses", h.handleListAnalyses)
 }
 
 func (h *Handler) handleAnalyze(w http.ResponseWriter, r *http.Request) {
@@ -37,6 +38,22 @@ func (h *Handler) handleAnalyze(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeJSON(w, http.StatusOK, resp)
+}
+
+func (h *Handler) handleListAnalyses(w http.ResponseWriter, r *http.Request) {
+	results, err := h.service.ListAnalyses(r.Context())
+	if err != nil {
+		slog.Error("failed to list analyses", "error", err)
+		writeError(w, http.StatusInternalServerError, "failed to retrieve analysis history")
+		return
+	}
+
+	if results == nil {
+		writeError(w, http.StatusServiceUnavailable, "persistence is not configured")
+		return
+	}
+
+	writeJSON(w, http.StatusOK, results)
 }
 
 func (h *Handler) handleServiceError(w http.ResponseWriter, err error) {
