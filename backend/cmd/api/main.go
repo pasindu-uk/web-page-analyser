@@ -2,11 +2,17 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
+
+	"github.com/pasindu/web-page-analyser/internal/config"
+	"github.com/pasindu/web-page-analyser/internal/logger"
 )
 
 func main() {
+	cfg := config.Load()
+	logger.Setup(cfg.LogLevel)
+
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
@@ -14,9 +20,9 @@ func main() {
 		fmt.Fprintln(w, "ok")
 	})
 
-	addr := ":8080"
-	log.Printf("server starting on %s", addr)
+	addr := fmt.Sprintf(":%d", cfg.Port)
+	slog.Info("server starting", "addr", addr)
 	if err := http.ListenAndServe(addr, mux); err != nil {
-		log.Fatalf("server failed: %v", err)
+		slog.Error("server failed", "error", err)
 	}
 }
