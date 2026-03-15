@@ -4,7 +4,7 @@ import AnalyzeForm from './components/AnalyzeForm';
 import AnalysisResult from './components/AnalysisResult';
 import ErrorMessage from './components/ErrorMessage';
 import { analyzeUrl, ApiError } from './api/analyzeApi';
-import { AnalyzeResponse } from './types/analysis';
+import type { AnalyzeResponse } from './types/analysis';
 
 function App() {
   const [isLoading, setIsLoading] = useState(false);

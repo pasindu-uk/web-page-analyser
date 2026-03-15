@@ -1,4 +1,4 @@
-import { AnalyzeResponse, ErrorResponse } from '../types/analysis';
+import type { AnalyzeResponse, ErrorResponse } from '../types/analysis';
 
 export class ApiError extends Error {
   statusCode: number;

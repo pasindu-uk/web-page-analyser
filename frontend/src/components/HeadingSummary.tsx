@@ -1,4 +1,4 @@
-import { HeadingCount } from '../types/analysis';
+import type { HeadingCount } from '../types/analysis';
 
 interface HeadingSummaryProps {
   headings: HeadingCount;

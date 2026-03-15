@@ -1,4 +1,4 @@
-import { AnalyzeResponse } from '../types/analysis';
+import type { AnalyzeResponse } from '../types/analysis';
 import HeadingSummary from './HeadingSummary';
 import LinkSummary from './LinkSummary';
 

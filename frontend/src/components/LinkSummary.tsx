@@ -1,4 +1,4 @@
-import { LinkSummary as LinkSummaryType } from '../types/analysis';
+import type { LinkSummary as LinkSummaryType } from '../types/analysis';
 
 interface LinkSummaryProps {
   links: LinkSummaryType;
