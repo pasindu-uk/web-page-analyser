@@ -97,9 +97,9 @@ func Analyze(body io.Reader, pageURL string) (*Result, error) {
 		result.HTMLVersion = "Unknown"
 	}
 
-	// Heuristic for SPAs: check if page data or attributes hint at a login page
+	// Heuristic for SPAs: check if page data, attributes, or title hint at a login page
 	if !result.HasLoginForm {
-		raw := strings.ToLower(rawBuilder.String())
+		raw := strings.ToLower(rawBuilder.String()) + " " + strings.ToLower(result.Title)
 		result.HasLoginForm = containsLoginHint(raw)
 	}
 
@@ -163,6 +163,7 @@ func containsLoginHint(raw string) bool {
 		"signin",
 		"log-in",
 		"login",
+		"log in",
 	}
 	for _, p := range patterns {
 		if strings.Contains(raw, p) {
