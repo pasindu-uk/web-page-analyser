@@ -26,3 +26,17 @@ export async function analyzeUrl(url: string): Promise<AnalyzeResponse> {
 
   return response.json();
 }
+
+export async function fetchAnalyses(): Promise<AnalyzeResponse[]> {
+  const response = await fetch('/api/analyses');
+
+  if (!response.ok) {
+    const errorBody: ErrorResponse = await response.json().catch(() => ({
+      statusCode: response.status,
+      message: response.statusText,
+    }));
+    throw new ApiError(errorBody.statusCode, errorBody.message);
+  }
+
+  return response.json();
+}
