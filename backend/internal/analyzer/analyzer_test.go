@@ -98,7 +98,7 @@ func TestAnalyze_LoginForm(t *testing.T) {
 		{
 			name:     "password outside form",
 			html:     `<html><body><input type="password" name="pass"></body></html>`,
-			expected: false,
+			expected: true,
 		},
 		{
 			name:     "no form",

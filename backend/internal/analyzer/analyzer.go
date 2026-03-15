@@ -38,7 +38,7 @@ func Analyze(body io.Reader, pageURL string) (*Result, error) {
 
 	var inTitle bool
 	var titleBuilder strings.Builder
-	var inForm bool
+	var rawBuilder strings.Builder
 
 	var walk func(*html.Node)
 	walk = func(n *html.Node) {
@@ -65,13 +65,15 @@ func Analyze(body io.Reader, pageURL string) (*Result, error) {
 				}
 			}
 
-			if tag == "form" {
-				inForm = true
-				defer func() { inForm = false }()
+			// Detect password inputs anywhere on the page (not just inside <form>)
+			if tag == "input" && getAttr(n, "type") == "password" {
+				result.HasLoginForm = true
 			}
 
-			if inForm && tag == "input" && getAttr(n, "type") == "password" {
-				result.HasLoginForm = true
+			// Collect attribute values for SPA detection
+			for _, attr := range n.Attr {
+				rawBuilder.WriteString(attr.Val)
+				rawBuilder.WriteByte(' ')
 			}
 		case html.TextNode:
 			if inTitle {
@@ -93,6 +95,12 @@ func Analyze(body io.Reader, pageURL string) (*Result, error) {
 
 	if result.HTMLVersion == "" {
 		result.HTMLVersion = "Unknown"
+	}
+
+	// Heuristic for SPAs: check if page data or attributes hint at a login page
+	if !result.HasLoginForm {
+		raw := strings.ToLower(rawBuilder.String())
+		result.HasLoginForm = containsLoginHint(raw)
 	}
 
 	return result, nil
@@ -142,6 +150,26 @@ func resolveLink(href string, pageURL *url.URL) *Link {
 		URL:        resolved.String(),
 		IsInternal: isInternal,
 	}
+}
+
+// containsLoginHint checks for common login-related patterns in SPA data attributes.
+func containsLoginHint(raw string) bool {
+	patterns := []string{
+		"\"password\"",
+		"type\":\"password",
+		"auth/login",
+		"auth\\/login",
+		"sign-in",
+		"signin",
+		"log-in",
+		"login",
+	}
+	for _, p := range patterns {
+		if strings.Contains(raw, p) {
+			return true
+		}
+	}
+	return false
 }
 
 func getAttr(n *html.Node, key string) string {
