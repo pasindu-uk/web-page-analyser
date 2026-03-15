@@ -5,6 +5,7 @@
 *.so
 *.dylib
 backend/bin/
+backend/api
 
 # Go
 *.test
