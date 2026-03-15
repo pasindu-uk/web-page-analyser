@@ -1,0 +1,17 @@
+CREATE TABLE IF NOT EXISTS analyses (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    url VARCHAR(2048) NOT NULL,
+    html_version VARCHAR(50) NOT NULL,
+    title VARCHAR(1024) NOT NULL,
+    h1_count INT NOT NULL DEFAULT 0,
+    h2_count INT NOT NULL DEFAULT 0,
+    h3_count INT NOT NULL DEFAULT 0,
+    h4_count INT NOT NULL DEFAULT 0,
+    h5_count INT NOT NULL DEFAULT 0,
+    h6_count INT NOT NULL DEFAULT 0,
+    internal_links INT NOT NULL DEFAULT 0,
+    external_links INT NOT NULL DEFAULT 0,
+    inaccessible_links INT NOT NULL DEFAULT 0,
+    has_login_form BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

@@ -12,6 +12,7 @@ type Config struct {
 	MaxLinkCheckWorkers int
 	MaxLinksToCheck     int
 	LogLevel            string
+	MySQLDSN            string
 }
 
 func Load() *Config {
@@ -21,6 +22,7 @@ func Load() *Config {
 		MaxLinkCheckWorkers: getEnvInt("MAX_LINK_CHECK_WORKERS", 5),
 		MaxLinksToCheck:     getEnvInt("MAX_LINKS_TO_CHECK", 50),
 		LogLevel:            getEnvStr("LOG_LEVEL", "info"),
+		MySQLDSN:            getEnvStr("MYSQL_DSN", ""),
 	}
 }
 
