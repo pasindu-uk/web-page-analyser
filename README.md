@@ -53,6 +53,8 @@ go run ./cmd/api
 
 The API starts on `http://localhost:8080`.
 
+> Detailed guide: [Backend Setup](docs/setup/backend/README.md)
+
 ### 2. Start the frontend
 
 ```bash
@@ -62,6 +64,8 @@ npm run dev
 ```
 
 The dev server starts on `http://localhost:5173` and proxies `/api` requests to the backend.
+
+> Detailed guide: [Frontend Setup](docs/setup/frontend/README.md)
 
 ### 3. Open the app
 
