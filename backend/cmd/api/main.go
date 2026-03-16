@@ -35,7 +35,7 @@ func main() {
 			os.Exit(1)
 		}
 		slog.Info("MySQL persistence enabled")
-		repo = mysqlRepo
+		repo = repository.NewCached(mysqlRepo)
 	}
 
 	svc := service.New(cfg, repo)
