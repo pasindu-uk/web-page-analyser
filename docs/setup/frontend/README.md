@@ -96,6 +96,7 @@ This means:
 2. Click **Analyze**
 3. View the results: HTML version, title, heading counts, link breakdown, and login form detection
 4. If MySQL is configured on the backend, past analyses appear in the **History** section
+5. Click **Clear Cache** next to the History heading to flush the in-memory cache and refresh the list
 
 ## Step 6: Lint the code
 
@@ -117,7 +118,7 @@ The output goes to `frontend/dist/`. This is a static build that can be served b
 frontend/
 ├── src/
 │   ├── api/
-│   │   └── analyzeApi.ts         # API client (POST /api/analyze, GET /api/analyses)
+│   │   └── analyzeApi.ts         # API client (POST /api/analyze, GET /api/analyses, DELETE /api/cache)
 │   ├── components/
 │   │   ├── AnalyzeForm.tsx       # URL input form with validation
 │   │   ├── AnalyzeForm.css

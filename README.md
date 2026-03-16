@@ -133,6 +133,7 @@ App manages all state (`isLoading`, `result`, `error`, `history`) and passes dat
 - **Link Analysis** — classifies links as internal or external, checks accessibility via concurrent HEAD requests using a worker pool
 - **Login Form Detection** — detects `<input type="password">` fields and uses heuristics for SPA login pages
 - **Analysis History** — stores past results in MySQL (when configured) and displays them in the UI, with an in-memory cache to avoid repeated DB queries
+- **Cache Management** — a "Clear Cache" button in the UI (and `DELETE /api/cache` endpoint) lets users flush the in-memory cache on demand
 
 ## Quick Start
 
@@ -176,6 +177,7 @@ Visit `http://localhost:5173` in your browser, enter a URL, and click **Analyze*
 |---|---|---|
 | `POST` | `/api/analyze` | Analyze a URL |
 | `GET` | `/api/analyses` | List past analyses (requires MySQL) |
+| `DELETE` | `/api/cache` | Clear the in-memory analysis cache |
 | `GET` | `/health` | Health check |
 
 ### POST /api/analyze

@@ -135,6 +135,17 @@ The history endpoint uses an **in-memory cache** — the first call queries MySQ
 curl http://localhost:8080/api/analyses
 ```
 
+### 5e. Clear the cache
+
+You can manually flush the in-memory cache without restarting the server:
+
+```bash
+curl -X DELETE http://localhost:8080/api/cache
+# {"status":"cache cleared"}
+```
+
+The next call to `GET /api/analyses` will re-query MySQL. The frontend also provides a **Clear Cache** button in the History section.
+
 ## Step 6: Run tests
 
 ```bash
@@ -177,7 +188,7 @@ backend/
 │   │   ├── fetcher.go            # HTTP client for fetching remote pages
 │   │   └── fetcher_test.go
 │   ├── handler/
-│   │   ├── handler.go            # HTTP handlers (POST /api/analyze, GET /api/analyses)
+│   │   ├── handler.go            # HTTP handlers (POST /api/analyze, GET /api/analyses, DELETE /api/cache)
 │   │   └── handler_test.go
 │   ├── logger/
 │   │   └── logger.go             # Configures structured logging (slog)
