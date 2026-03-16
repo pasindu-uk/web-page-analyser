@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"sync/atomic"
 	"testing"
 	"time"
 )
@@ -50,9 +51,9 @@ func TestCheckLinks_EmptyList(t *testing.T) {
 }
 
 func TestCheckLinks_MaxLinksCap(t *testing.T) {
-	callCount := 0
+	var callCount atomic.Int32
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		callCount++
+		callCount.Add(1)
 		w.WriteHeader(http.StatusOK)
 	}))
 	defer srv.Close()
@@ -61,8 +62,8 @@ func TestCheckLinks_MaxLinksCap(t *testing.T) {
 	urls := []string{srv.URL + "/1", srv.URL + "/2", srv.URL + "/3", srv.URL + "/4", srv.URL + "/5"}
 	lc.CheckLinks(context.Background(), urls)
 
-	if callCount != 3 {
-		t.Errorf("expected 3 calls (maxLinks=3), got %d", callCount)
+	if callCount.Load() != 3 {
+		t.Errorf("expected 3 calls (maxLinks=3), got %d", callCount.Load())
 	}
 }
 

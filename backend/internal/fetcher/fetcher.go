@@ -49,8 +49,17 @@ func (f *Fetcher) Fetch(ctx context.Context, url string) (*Result, error) {
 		return nil, fmt.Errorf("response is not HTML (Content-Type: %s)", contentType)
 	}
 
+	const maxBodySize = 10 << 20 // 10 MB
+	limitedBody := struct {
+		io.Reader
+		io.Closer
+	}{
+		Reader: io.LimitReader(resp.Body, maxBodySize),
+		Closer: resp.Body,
+	}
+
 	return &Result{
-		Body:     resp.Body,
+		Body:     limitedBody,
 		FinalURL: resp.Request.URL.String(),
 	}, nil
 }

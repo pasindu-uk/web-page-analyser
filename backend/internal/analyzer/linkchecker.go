@@ -10,7 +10,6 @@ import (
 type LinkChecker struct {
 	maxWorkers int
 	maxLinks   int
-	timeout    time.Duration
 	client     *http.Client
 }
 
@@ -18,7 +17,6 @@ func NewLinkChecker(maxWorkers, maxLinks int, timeout time.Duration) *LinkChecke
 	return &LinkChecker{
 		maxWorkers: maxWorkers,
 		maxLinks:   maxLinks,
-		timeout:    timeout,
 		client: &http.Client{
 			Timeout: timeout,
 			CheckRedirect: func(req *http.Request, via []*http.Request) error {

@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/pasindu/web-page-analyser/internal/config"
 )
@@ -12,7 +13,7 @@ import (
 func testConfig() *config.Config {
 	return &config.Config{
 		Port:                8080,
-		RequestTimeout:      5_000_000_000, // 5s
+		RequestTimeout:      5 * time.Second,
 		MaxLinkCheckWorkers: 2,
 		MaxLinksToCheck:     10,
 		LogLevel:            "info",

@@ -1,6 +1,7 @@
 package analyzer
 
 import (
+	"fmt"
 	"io"
 	"net/url"
 	"strings"
@@ -27,7 +28,10 @@ func Analyze(body io.Reader, pageURL string) (*Result, error) {
 		return nil, err
 	}
 
-	pageU, _ := url.Parse(pageURL)
+	pageU, err := url.Parse(pageURL)
+	if err != nil {
+		return nil, fmt.Errorf("invalid page URL: %w", err)
+	}
 
 	result := &Result{
 		Headings: map[string]int{

@@ -80,9 +80,11 @@ func (s *AnalyzeService) Analyze(ctx context.Context, rawURL string) (*model.Ana
 	}
 
 	if s.repo != nil {
-		if err := s.repo.Save(ctx, resp); err != nil {
-			slog.Error("failed to persist analysis", "error", err)
-		}
+		go func() {
+			if err := s.repo.Save(context.Background(), resp); err != nil {
+				slog.Error("failed to persist analysis", "error", err)
+			}
+		}()
 	}
 
 	return resp, nil
