@@ -1,4 +1,5 @@
 import type { AnalyzeResponse } from '../types/analysis';
+import './AnalysisHistory.css';
 
 interface AnalysisHistoryProps {
   history: AnalyzeResponse[];
@@ -7,56 +8,32 @@ interface AnalysisHistoryProps {
 
 export default function AnalysisHistory({ history, onSelect }: AnalysisHistoryProps) {
   if (history.length === 0) {
-    return (
-      <div style={{ color: '#6b7280', fontSize: '14px', textAlign: 'center', padding: '16px' }}>
-        No analysis history yet.
-      </div>
-    );
+    return <div className="history__empty">No analysis history yet.</div>;
   }
 
   return (
-    <div>
-      <h2 style={{ fontSize: '20px', marginBottom: '12px' }}>History</h2>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        {history.map((item, index) => (
+    <section aria-label="Analysis history">
+      <h2>History</h2>
+      <div className="history__list">
+        {history.map((item) => (
           <button
-            key={index}
+            key={item.url}
             onClick={() => onSelect(item)}
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              padding: '12px 16px',
-              backgroundColor: '#f9fafb',
-              border: '1px solid #e5e7eb',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              textAlign: 'left',
-              fontSize: '14px',
-              transition: 'background-color 0.15s',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f3f4f6')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f9fafb')}
+            className="history__item"
           >
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {item.title || 'No title'}
-              </div>
-              <div style={{ color: '#6b7280', fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {item.url}
-              </div>
+            <div className="history__item-info">
+              <div className="history__item-title">{item.title || 'No title'}</div>
+              <div className="history__item-url">{item.url}</div>
             </div>
-            <div style={{ display: 'flex', gap: '8px', marginLeft: '12px', flexShrink: 0, fontSize: '12px' }}>
-              <span style={{ color: '#6b7280' }}>{item.htmlVersion}</span>
+            <div className="history__item-meta">
+              <span className="history__item-version">{item.htmlVersion}</span>
               {item.hasLoginForm && (
-                <span style={{ padding: '1px 6px', backgroundColor: '#dcfce7', color: '#16a34a', borderRadius: '4px', fontWeight: 600 }}>
-                  Login
-                </span>
+                <span className="history__login-badge">Login</span>
               )}
             </div>
           </button>
         ))}
       </div>
-    </div>
+    </section>
   );
 }

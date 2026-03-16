@@ -1,0 +1,27 @@
+.link-summary__grid {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.link-summary__item {
+  padding: 8px 16px;
+  background-color: #f3f4f6;
+  border-radius: 6px;
+  text-align: center;
+  min-width: 80px;
+}
+
+.link-summary__count {
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.link-summary__count--internal { color: #16a34a; }
+.link-summary__count--external { color: #2563eb; }
+.link-summary__count--inaccessible { color: #dc2626; }
+
+.link-summary__label {
+  font-size: 13px;
+  color: #6b7280;
+}

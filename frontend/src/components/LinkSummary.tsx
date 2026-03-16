@@ -1,33 +1,27 @@
 import type { LinkSummary as LinkSummaryType } from '../types/analysis';
+import './LinkSummary.css';
 
 interface LinkSummaryProps {
   links: LinkSummaryType;
 }
 
-export default function LinkSummary({ links }: LinkSummaryProps) {
-  const entries = [
-    { label: 'Internal', count: links.internal, color: '#16a34a' },
-    { label: 'External', count: links.external, color: '#2563eb' },
-    { label: 'Inaccessible', count: links.inaccessible, color: '#dc2626' },
-  ];
+const LINK_TYPES = [
+  { key: 'internal', label: 'Internal' },
+  { key: 'external', label: 'External' },
+  { key: 'inaccessible', label: 'Inaccessible' },
+] as const;
 
+export default function LinkSummary({ links }: LinkSummaryProps) {
   return (
     <div>
-      <h3 style={{ marginBottom: '8px' }}>Links</h3>
-      <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-        {entries.map(({ label, count, color }) => (
-          <div
-            key={label}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#f3f4f6',
-              borderRadius: '6px',
-              textAlign: 'center',
-              minWidth: '80px',
-            }}
-          >
-            <div style={{ fontWeight: 600, fontSize: '18px', color }}>{count}</div>
-            <div style={{ fontSize: '13px', color: '#6b7280' }}>{label}</div>
+      <h3>Links</h3>
+      <div className="link-summary__grid">
+        {LINK_TYPES.map(({ key, label }) => (
+          <div key={key} className="link-summary__item">
+            <div className={`link-summary__count link-summary__count--${key}`}>
+              {links[key]}
+            </div>
+            <div className="link-summary__label">{label}</div>
           </div>
         ))}
       </div>

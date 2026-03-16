@@ -1,0 +1,48 @@
+.analyze-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.analyze-form__row {
+  display: flex;
+  gap: 8px;
+}
+
+.analyze-form__input {
+  flex: 1;
+  padding: 10px 14px;
+  font-size: 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  outline: none;
+}
+
+.analyze-form__input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.analyze-form__button {
+  padding: 10px 24px;
+  font-size: 16px;
+  background-color: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.analyze-form__button:hover:not(:disabled) {
+  background-color: #1d4ed8;
+}
+
+.analyze-form__button:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.analyze-form__error {
+  color: #dc2626;
+  font-size: 14px;
+}

@@ -1,0 +1,46 @@
+.result-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.result-card__details {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 15px;
+}
+
+.result-card__details > div {
+  display: flex;
+  gap: 4px;
+}
+
+.result-card__details dt {
+  font-weight: 600;
+}
+
+.result-card__details dd {
+  margin: 0;
+}
+
+.result-card__badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.result-card__badge--yes {
+  background-color: #dcfce7;
+  color: #16a34a;
+}
+
+.result-card__badge--no {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}

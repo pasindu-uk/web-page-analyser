@@ -9,34 +9,27 @@ export class ApiError extends Error {
   }
 }
 
+async function handleResponse<T>(response: Response): Promise<T> {
+  if (!response.ok) {
+    const errorBody: ErrorResponse = await response.json().catch(() => ({
+      statusCode: response.status,
+      message: response.statusText,
+    }));
+    throw new ApiError(errorBody.statusCode, errorBody.message);
+  }
+  return response.json();
+}
+
 export async function analyzeUrl(url: string): Promise<AnalyzeResponse> {
   const response = await fetch('/api/analyze', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ url }),
   });
-
-  if (!response.ok) {
-    const errorBody: ErrorResponse = await response.json().catch(() => ({
-      statusCode: response.status,
-      message: response.statusText,
-    }));
-    throw new ApiError(errorBody.statusCode, errorBody.message);
-  }
-
-  return response.json();
+  return handleResponse<AnalyzeResponse>(response);
 }
 
 export async function fetchAnalyses(): Promise<AnalyzeResponse[]> {
   const response = await fetch('/api/analyses');
-
-  if (!response.ok) {
-    const errorBody: ErrorResponse = await response.json().catch(() => ({
-      statusCode: response.status,
-      message: response.statusText,
-    }));
-    throw new ApiError(errorBody.statusCode, errorBody.message);
-  }
-
-  return response.json();
+  return handleResponse<AnalyzeResponse[]>(response);
 }

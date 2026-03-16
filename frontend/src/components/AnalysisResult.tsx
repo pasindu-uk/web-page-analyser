@@ -1,6 +1,7 @@
 import type { AnalyzeResponse } from '../types/analysis';
 import HeadingSummary from './HeadingSummary';
 import LinkSummary from './LinkSummary';
+import './AnalysisResult.css';
 
 interface AnalysisResultProps {
   result: AnalyzeResponse;
@@ -8,42 +9,26 @@ interface AnalysisResultProps {
 
 export default function AnalysisResult({ result }: AnalysisResultProps) {
   return (
-    <div
-      style={{
-        border: '1px solid #e5e7eb',
-        borderRadius: '8px',
-        padding: '24px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '20px',
-      }}
-    >
+    <section className="result-card" aria-label="Analysis result">
       <div>
-        <h2 style={{ marginBottom: '12px' }}>Analysis Result</h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '15px' }}>
-          <div><strong>URL:</strong> {result.url}</div>
-          <div><strong>HTML Version:</strong> {result.htmlVersion}</div>
-          <div><strong>Title:</strong> {result.title || <em>No title</em>}</div>
+        <h2>Analysis Result</h2>
+        <dl className="result-card__details">
+          <div><dt>URL:</dt> <dd>{result.url}</dd></div>
+          <div><dt>HTML Version:</dt> <dd>{result.htmlVersion}</dd></div>
+          <div><dt>Title:</dt> <dd>{result.title || <em>No title</em>}</dd></div>
           <div>
-            <strong>Login Form:</strong>{' '}
-            <span
-              style={{
-                padding: '2px 8px',
-                borderRadius: '4px',
-                fontSize: '13px',
-                fontWeight: 600,
-                backgroundColor: result.hasLoginForm ? '#dcfce7' : '#f3f4f6',
-                color: result.hasLoginForm ? '#16a34a' : '#6b7280',
-              }}
-            >
-              {result.hasLoginForm ? 'Yes' : 'No'}
-            </span>
+            <dt>Login Form:</dt>{' '}
+            <dd>
+              <span className={`result-card__badge result-card__badge--${result.hasLoginForm ? 'yes' : 'no'}`}>
+                {result.hasLoginForm ? 'Yes' : 'No'}
+              </span>
+            </dd>
           </div>
-        </div>
+        </dl>
       </div>
 
       <HeadingSummary headings={result.headings} />
       <LinkSummary links={result.links} />
-    </div>
+    </section>
   );
 }

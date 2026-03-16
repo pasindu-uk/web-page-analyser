@@ -61,8 +61,10 @@ function App() {
       <main className="app-main">
         <AnalyzeForm onSubmit={handleAnalyze} isLoading={isLoading} />
 
-        {error && <ErrorMessage statusCode={error.statusCode} message={error.message} />}
-        {result && <AnalysisResult result={result} />}
+        <div aria-live="polite">
+          {error && <ErrorMessage statusCode={error.statusCode} message={error.message} />}
+          {result && <AnalysisResult result={result} />}
+        </div>
 
         <AnalysisHistory history={history} onSelect={handleSelectHistory} />
       </main>

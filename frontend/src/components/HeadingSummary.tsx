@@ -1,36 +1,21 @@
 import type { HeadingCount } from '../types/analysis';
+import './HeadingSummary.css';
 
 interface HeadingSummaryProps {
   headings: HeadingCount;
 }
 
-export default function HeadingSummary({ headings }: HeadingSummaryProps) {
-  const entries = [
-    { label: 'H1', count: headings.h1 },
-    { label: 'H2', count: headings.h2 },
-    { label: 'H3', count: headings.h3 },
-    { label: 'H4', count: headings.h4 },
-    { label: 'H5', count: headings.h5 },
-    { label: 'H6', count: headings.h6 },
-  ];
+const HEADING_LEVELS = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] as const;
 
+export default function HeadingSummary({ headings }: HeadingSummaryProps) {
   return (
     <div>
-      <h3 style={{ marginBottom: '8px' }}>Headings</h3>
-      <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-        {entries.map(({ label, count }) => (
-          <div
-            key={label}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#f3f4f6',
-              borderRadius: '6px',
-              textAlign: 'center',
-              minWidth: '60px',
-            }}
-          >
-            <div style={{ fontWeight: 600, fontSize: '18px' }}>{count}</div>
-            <div style={{ fontSize: '13px', color: '#6b7280' }}>{label}</div>
+      <h3>Headings</h3>
+      <div className="heading-summary__grid">
+        {HEADING_LEVELS.map((level) => (
+          <div key={level} className="heading-summary__item">
+            <div className="heading-summary__count">{headings[level]}</div>
+            <div className="heading-summary__label">{level.toUpperCase()}</div>
           </div>
         ))}
       </div>
