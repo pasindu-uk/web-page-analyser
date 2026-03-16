@@ -98,6 +98,17 @@ func (s *AnalyzeService) ListAnalyses(ctx context.Context) ([]model.AnalyzeRespo
 	return s.repo.List(ctx)
 }
 
+// ClearCache invalidates the in-memory cache if the underlying repository supports it.
+// Returns true if cache was cleared, false if no cache is configured.
+func (s *AnalyzeService) ClearCache() bool {
+	type cacheInvalidator interface{ Invalidate() }
+	if ci, ok := s.repo.(cacheInvalidator); ok {
+		ci.Invalidate()
+		return true
+	}
+	return false
+}
+
 func validateURL(rawURL string) error {
 	if rawURL == "" {
 		return fmt.Errorf("URL is required")

@@ -22,6 +22,7 @@ func New(svc *service.AnalyzeService) *Handler {
 func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /api/analyze", h.handleAnalyze)
 	mux.HandleFunc("GET /api/analyses", h.handleListAnalyses)
+	mux.HandleFunc("DELETE /api/cache", h.handleClearCache)
 }
 
 const maxRequestBodySize = 1 << 20 // 1 MB
@@ -60,6 +61,14 @@ func (h *Handler) handleListAnalyses(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, results)
 }
 
+func (h *Handler) handleClearCache(w http.ResponseWriter, r *http.Request) {
+	if h.service.ClearCache() {
+		writeJSON(w, http.StatusOK, map[string]string{"status": "cache cleared"})
+	} else {
+		writeJSON(w, http.StatusOK, map[string]string{"status": "no cache configured"})
+	}
+}
+
 func (h *Handler) handleServiceError(w http.ResponseWriter, err error) {
 	var validationErr *service.ValidationError
 	if errors.As(err, &validationErr) {
@@ -96,7 +105,7 @@ func writeError(w http.ResponseWriter, status int, message string) {
 func CORSMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
 		if r.Method == http.MethodOptions {

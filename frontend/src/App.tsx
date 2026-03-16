@@ -4,7 +4,7 @@ import AnalyzeForm from './components/AnalyzeForm';
 import AnalysisResult from './components/AnalysisResult';
 import AnalysisHistory from './components/AnalysisHistory';
 import ErrorMessage from './components/ErrorMessage';
-import { analyzeUrl, fetchAnalyses, ApiError } from './api/analyzeApi';
+import { analyzeUrl, fetchAnalyses, clearCache, ApiError } from './api/analyzeApi';
 import type { AnalyzeResponse } from './types/analysis';
 
 function App() {
@@ -46,6 +46,16 @@ function App() {
     }
   }
 
+  async function handleClearCache() {
+    try {
+      await clearCache();
+      setHistory([]);
+      loadHistory();
+    } catch {
+      // silently ignore
+    }
+  }
+
   function handleSelectHistory(item: AnalyzeResponse) {
     setResult(item);
     setError(null);
@@ -66,7 +76,7 @@ function App() {
           {result && <AnalysisResult result={result} />}
         </div>
 
-        <AnalysisHistory history={history} onSelect={handleSelectHistory} />
+        <AnalysisHistory history={history} onSelect={handleSelectHistory} onClearCache={handleClearCache} />
       </main>
     </div>
   );

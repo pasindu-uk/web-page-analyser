@@ -1,3 +1,29 @@
+.history__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.history__header h2 {
+  margin: 0;
+}
+
+.history__clear-btn {
+  padding: 4px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  background-color: #2563eb;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.history__clear-btn:hover {
+  background-color: #1d4ed8;
+}
+
 .history__empty {
   color: #6b7280;
   font-size: 14px;

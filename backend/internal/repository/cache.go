@@ -47,6 +47,13 @@ func (c *CachedRepository) List(ctx context.Context) ([]model.AnalyzeResponse, e
 	return results, nil
 }
 
+// Invalidate marks the cache as stale so the next List call re-queries the inner repository.
+func (c *CachedRepository) Invalidate() {
+	c.mu.Lock()
+	c.valid = false
+	c.mu.Unlock()
+}
+
 func (c *CachedRepository) Save(ctx context.Context, resp *model.AnalyzeResponse) error {
 	if err := c.inner.Save(ctx, resp); err != nil {
 		return err

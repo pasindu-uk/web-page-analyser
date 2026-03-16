@@ -4,16 +4,24 @@ import './AnalysisHistory.css';
 interface AnalysisHistoryProps {
   history: AnalyzeResponse[];
   onSelect: (result: AnalyzeResponse) => void;
+  onClearCache?: () => void;
 }
 
-export default function AnalysisHistory({ history, onSelect }: AnalysisHistoryProps) {
+export default function AnalysisHistory({ history, onSelect, onClearCache }: AnalysisHistoryProps) {
   if (history.length === 0) {
     return <div className="history__empty">No analysis history yet.</div>;
   }
 
   return (
     <section aria-label="Analysis history">
-      <h2>History</h2>
+      <div className="history__header">
+        <h2>History</h2>
+        {onClearCache && (
+          <button className="history__clear-btn" onClick={onClearCache}>
+            Clear Cache
+          </button>
+        )}
+      </div>
       <div className="history__list">
         {history.map((item) => (
           <button

@@ -33,3 +33,8 @@ export async function fetchAnalyses(): Promise<AnalyzeResponse[]> {
   const response = await fetch('/api/analyses');
   return handleResponse<AnalyzeResponse[]>(response);
 }
+
+export async function clearCache(): Promise<void> {
+  const response = await fetch('/api/cache', { method: 'DELETE' });
+  if (!response.ok) throw new ApiError(response.status, 'Failed to clear cache');
+}
