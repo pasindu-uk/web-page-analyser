@@ -10,21 +10,117 @@ A full-stack web application that analyzes any public URL and returns a structur
 
 ## Architecture
 
-```
-React UI → Go API (POST /api/analyze) → Page Fetcher → HTML Analyzer → Link Checker (worker pool) → JSON Response
+### Request Flow
+
+```mermaid
+sequenceDiagram
+    participant Browser
+    participant Frontend as React Frontend
+    participant Handler as Go Handler
+    participant Service
+    participant Fetcher
+    participant Analyzer
+    participant LinkChecker as Link Checker
+    participant DB as MySQL (optional)
+
+    Browser->>Frontend: Enter URL & click Analyze
+    Frontend->>Handler: POST /api/analyze {"url": "..."}
+    Handler->>Service: Analyze(ctx, url)
+    Service->>Service: Validate URL
+    Service->>Fetcher: Fetch(ctx, url)
+    Fetcher->>Fetcher: HTTP GET → remote page
+    Fetcher-->>Service: HTML body + final URL
+    Service->>Analyzer: Analyze(body, finalURL)
+    Analyzer-->>Service: title, headings, links, loginForm
+    Service->>LinkChecker: CheckLinks(ctx, urls)
+    LinkChecker->>LinkChecker: Worker pool (HEAD requests)
+    LinkChecker-->>Service: inaccessible count
+    Service->>DB: Save result (fire-and-forget)
+    Service-->>Handler: AnalyzeResponse
+    Handler-->>Frontend: JSON response
+    Frontend-->>Browser: Render results
 ```
 
-The backend follows a layered architecture:
+### Backend Package Structure
 
-| Layer | Package | Responsibility |
-|---|---|---|
-| HTTP | `internal/handler` | Request/response handling, routing, CORS |
-| Business Logic | `internal/service` | Orchestrates fetching, analysis, link checking |
-| HTML Parsing | `internal/analyzer` | Doctype detection, title, headings, forms |
-| HTTP Client | `internal/fetcher` | Fetches remote pages with configurable timeout |
-| Persistence | `internal/repository` | Optional MySQL storage for analysis history |
-| Config | `internal/config` | Environment-based configuration with `.env` support |
-| Logging | `internal/logger` | Structured logging via `slog` |
+```mermaid
+graph TD
+    Main[cmd/api/main.go] --> Config[config]
+    Main --> Logger[logger]
+    Main --> Repo[repository]
+    Main --> Service[service]
+    Main --> Handler[handler]
+
+    Handler --> Service
+    Service --> Fetcher[fetcher]
+    Service --> Analyzer[analyzer]
+    Service --> Repo
+
+    Analyzer --> LC[linkchecker]
+
+    Handler --> Model[model]
+    Service --> Model
+    Repo --> Model
+
+    Repo --> DB[(MySQL)]
+
+    style Main fill:#e0f2fe
+    style Handler fill:#dbeafe
+    style Service fill:#dbeafe
+    style Fetcher fill:#dbeafe
+    style Analyzer fill:#dbeafe
+    style LC fill:#dbeafe
+    style Repo fill:#dbeafe
+    style Config fill:#f0fdf4
+    style Logger fill:#f0fdf4
+    style Model fill:#f0fdf4
+    style DB fill:#fef3c7
+```
+
+### Worker Pool (Link Checker)
+
+```mermaid
+graph LR
+    URLs[URLs from page] --> Channel[Buffered Channel]
+    Channel --> W1[Worker 1]
+    Channel --> W2[Worker 2]
+    Channel --> W3[Worker 3]
+    Channel --> W4[Worker 4]
+    Channel --> W5[Worker 5]
+    W1 --> Counter[Inaccessible Count]
+    W2 --> Counter
+    W3 --> Counter
+    W4 --> Counter
+    W5 --> Counter
+    Counter --> Result[Return count]
+
+    style Channel fill:#dbeafe
+    style Counter fill:#fef3c7
+```
+
+Each worker is a goroutine that pulls URLs from the channel and makes concurrent HEAD requests. A `sync.Mutex` protects the shared counter. The pool size is configurable via `MAX_LINK_CHECK_WORKERS`.
+
+### Frontend Component Tree
+
+```mermaid
+graph TD
+    App --> Form[AnalyzeForm]
+    App --> Err[ErrorMessage]
+    App --> AR[AnalysisResult]
+    App --> AH[AnalysisHistory]
+    AR --> HS[HeadingSummary]
+    AR --> LS[LinkSummary]
+
+    style App fill:#e0f2fe
+    style Form fill:#dbeafe
+    style Err fill:#fee2e2
+    style AR fill:#dbeafe
+    style AH fill:#dbeafe
+    style HS fill:#f0fdf4
+    style LS fill:#f0fdf4
+```
+
+App manages all state (`isLoading`, `result`, `error`, `history`) and passes data down to child components via props.
 
 ## Features
 
