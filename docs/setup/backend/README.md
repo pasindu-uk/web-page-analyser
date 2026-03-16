@@ -129,7 +129,7 @@ You should see this in the logs:
 
 ### 5d. Verify history endpoint
 
-After analyzing a few URLs, check that history is stored:
+The history endpoint uses an **in-memory cache** — the first call queries MySQL, and subsequent calls return cached results until a new analysis is saved. After analyzing a few URLs, check that history is stored:
 
 ```bash
 curl http://localhost:8080/api/analyses
@@ -185,6 +185,8 @@ backend/
 │   │   └── model.go              # Shared request/response types
 │   ├── repository/
 │   │   ├── repository.go         # MySQL repository (Save/List)
+│   │   ├── cache.go              # In-memory cache (decorator over Repository)
+│   │   ├── cache_test.go
 │   │   ├── migrations.go         # Embedded SQL migration runner
 │   │   ├── migrations/
 │   │   │   └── 001_create_analyses.sql

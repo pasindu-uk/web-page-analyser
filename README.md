@@ -48,14 +48,16 @@ graph TD
     Main[cmd/api/main.go] --> Config[config]
     Main --> Logger[logger]
     Main --> Repo[repository]
+    Main --> Cache[cache]
     Main --> Service[service]
     Main --> Handler[handler]
 
     Handler --> Service
     Service --> Fetcher[fetcher]
     Service --> Analyzer[analyzer]
-    Service --> Repo
+    Service --> Cache
 
+    Cache --> Repo
     Analyzer --> LC[linkchecker]
 
     Handler --> Model[model]
@@ -71,6 +73,7 @@ graph TD
     style Analyzer fill:#dbeafe
     style LC fill:#dbeafe
     style Repo fill:#dbeafe
+    style Cache fill:#dbeafe
     style Config fill:#f0fdf4
     style Logger fill:#f0fdf4
     style Model fill:#f0fdf4
@@ -129,7 +132,7 @@ App manages all state (`isLoading`, `result`, `error`, `history`) and passes dat
 - **Heading Analysis** — counts H1 through H6 tags
 - **Link Analysis** — classifies links as internal or external, checks accessibility via concurrent HEAD requests using a worker pool
 - **Login Form Detection** — detects `<input type="password">` fields and uses heuristics for SPA login pages
-- **Analysis History** — stores past results in MySQL (when configured) and displays them in the UI
+- **Analysis History** — stores past results in MySQL (when configured) and displays them in the UI, with an in-memory cache to avoid repeated DB queries
 
 ## Quick Start
 
@@ -226,7 +229,7 @@ go test ./...
 │   │   ├── handler/          # HTTP handlers and routing
 │   │   ├── logger/           # Structured logging setup
 │   │   ├── model/            # Shared data types
-│   │   ├── repository/       # MySQL persistence (optional)
+│   │   ├── repository/       # MySQL persistence + in-memory cache (optional)
 │   │   └── service/          # Business logic orchestration
 │   ├── .env.example          # Example environment config
 │   └── go.mod
