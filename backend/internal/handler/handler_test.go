@@ -8,9 +8,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/pasindu/web-page-analyser/internal/config"
-	"github.com/pasindu/web-page-analyser/internal/model"
-	"github.com/pasindu/web-page-analyser/internal/service"
+	"github.com/pasindu-uk/web-page-analyser/internal/config"
+	"github.com/pasindu-uk/web-page-analyser/internal/model"
+	"github.com/pasindu-uk/web-page-analyser/internal/service"
 )
 
 func setupHandler() (*Handler, *http.ServeMux) {

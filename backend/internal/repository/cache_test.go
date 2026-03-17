@@ -6,7 +6,7 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/pasindu/web-page-analyser/internal/model"
+	"github.com/pasindu-uk/web-page-analyser/internal/model"
 )
 
 // mockRepo is a minimal Repository implementation for testing the cache.

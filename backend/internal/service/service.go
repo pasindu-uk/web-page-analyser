@@ -6,11 +6,11 @@ import (
 	"log/slog"
 	"net/url"
 
-	"github.com/pasindu/web-page-analyser/internal/analyzer"
-	"github.com/pasindu/web-page-analyser/internal/config"
-	"github.com/pasindu/web-page-analyser/internal/fetcher"
-	"github.com/pasindu/web-page-analyser/internal/model"
-	"github.com/pasindu/web-page-analyser/internal/repository"
+	"github.com/pasindu-uk/web-page-analyser/internal/analyzer"
+	"github.com/pasindu-uk/web-page-analyser/internal/config"
+	"github.com/pasindu-uk/web-page-analyser/internal/fetcher"
+	"github.com/pasindu-uk/web-page-analyser/internal/model"
+	"github.com/pasindu-uk/web-page-analyser/internal/repository"
 )
 
 type AnalyzeService struct {

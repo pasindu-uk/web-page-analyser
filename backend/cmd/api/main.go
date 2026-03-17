@@ -10,11 +10,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/pasindu/web-page-analyser/internal/config"
-	"github.com/pasindu/web-page-analyser/internal/handler"
-	"github.com/pasindu/web-page-analyser/internal/logger"
-	"github.com/pasindu/web-page-analyser/internal/repository"
-	"github.com/pasindu/web-page-analyser/internal/service"
+	"github.com/pasindu-uk/web-page-analyser/internal/config"
+	"github.com/pasindu-uk/web-page-analyser/internal/handler"
+	"github.com/pasindu-uk/web-page-analyser/internal/logger"
+	"github.com/pasindu-uk/web-page-analyser/internal/repository"
+	"github.com/pasindu-uk/web-page-analyser/internal/service"
 )
 
 func main() {

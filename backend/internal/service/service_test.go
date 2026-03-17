@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/pasindu/web-page-analyser/internal/config"
+	"github.com/pasindu-uk/web-page-analyser/internal/config"
 )
 
 func testConfig() *config.Config {

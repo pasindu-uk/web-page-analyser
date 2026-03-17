@@ -7,7 +7,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 
-	"github.com/pasindu/web-page-analyser/internal/model"
+	"github.com/pasindu-uk/web-page-analyser/internal/model"
 )
 
 func setupTestDB(t *testing.T) *MySQLRepository {

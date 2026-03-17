@@ -6,9 +6,9 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/pasindu/web-page-analyser/internal/fetcher"
-	"github.com/pasindu/web-page-analyser/internal/model"
-	"github.com/pasindu/web-page-analyser/internal/service"
+	"github.com/pasindu-uk/web-page-analyser/internal/fetcher"
+	"github.com/pasindu-uk/web-page-analyser/internal/model"
+	"github.com/pasindu-uk/web-page-analyser/internal/service"
 )
 
 type Handler struct {

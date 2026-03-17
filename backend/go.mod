@@ -1,4 +1,4 @@
-module github.com/pasindu/web-page-analyser
+module github.com/pasindu-uk/web-page-analyser
 
 go 1.26.1
 

@@ -4,7 +4,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/pasindu/web-page-analyser/internal/model"
+	"github.com/pasindu-uk/web-page-analyser/internal/model"
 )
 
 // CachedRepository wraps a Repository and caches List results in memory.
