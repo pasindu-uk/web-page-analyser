@@ -27,7 +27,7 @@ func Load() *Config {
 		Port:                getEnvInt("PORT", 8080),
 		RequestTimeout:      getEnvDuration("REQUEST_TIMEOUT", 10*time.Second),
 		MaxLinkCheckWorkers: getEnvInt("MAX_LINK_CHECK_WORKERS", 5),
-		MaxLinksToCheck:     getEnvInt("MAX_LINKS_TO_CHECK", 50),
+		MaxLinksToCheck:     getEnvInt("MAX_LINKS_TO_CHECK", 0),
 		LogLevel:            getEnvStr("LOG_LEVEL", "info"),
 		MySQLDSN:            getEnvStr("MYSQL_DSN", ""),
 	}

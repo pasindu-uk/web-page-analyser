@@ -72,6 +72,7 @@ func (lc *LinkChecker) CheckLinks(ctx context.Context, urls []string) int {
 }
 
 func (lc *LinkChecker) isAccessible(ctx context.Context, rawURL string) bool {
+	// Try HEAD first (lightweight, no body transfer).
 	req, err := http.NewRequestWithContext(ctx, http.MethodHead, rawURL, nil)
 	if err != nil {
 		return false
@@ -79,6 +80,25 @@ func (lc *LinkChecker) isAccessible(ctx context.Context, rawURL string) bool {
 	req.Header.Set("User-Agent", "WebPageAnalyzer/1.0")
 
 	resp, err := lc.client.Do(req)
+	if err == nil {
+		resp.Body.Close()
+		// Many servers block HEAD or return 405. Fall through to GET in those cases.
+		if resp.StatusCode < 400 {
+			return true
+		}
+		if resp.StatusCode != http.StatusMethodNotAllowed && resp.StatusCode != http.StatusForbidden {
+			return false
+		}
+	}
+
+	// Fallback to GET when HEAD fails or is rejected.
+	req, err = http.NewRequestWithContext(ctx, http.MethodGet, rawURL, nil)
+	if err != nil {
+		return false
+	}
+	req.Header.Set("User-Agent", "WebPageAnalyzer/1.0")
+
+	resp, err = lc.client.Do(req)
 	if err != nil {
 		return false
 	}
