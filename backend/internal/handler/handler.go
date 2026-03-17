@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"log/slog"
+	"net"
 	"net/http"
+	"strings"
 
 	"github.com/pasindu-uk/web-page-analyser/internal/fetcher"
 	"github.com/pasindu-uk/web-page-analyser/internal/model"
@@ -83,7 +85,29 @@ func (h *Handler) handleServiceError(w http.ResponseWriter, err error) {
 	}
 
 	slog.Error("analysis failed", "error", err)
-	writeError(w, http.StatusBadGateway, err.Error())
+	writeError(w, http.StatusBadGateway, friendlyError(err))
+}
+
+func friendlyError(err error) string {
+	var dnsErr *net.DNSError
+	if errors.As(err, &dnsErr) {
+		return "the website could not be found — check the URL and try again"
+	}
+
+	var netErr net.Error
+	if errors.As(err, &netErr) && netErr.Timeout() {
+		return "the website took too long to respond"
+	}
+
+	if strings.Contains(err.Error(), "connection refused") {
+		return "the website refused the connection"
+	}
+
+	if strings.Contains(err.Error(), "no such host") {
+		return "the website could not be found — check the URL and try again"
+	}
+
+	return "failed to fetch the page"
 }
 
 func writeJSON(w http.ResponseWriter, status int, data any) {
