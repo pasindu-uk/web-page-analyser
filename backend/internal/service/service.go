@@ -22,7 +22,7 @@ type AnalyzeService struct {
 func New(cfg *config.Config, repo repository.Repository) *AnalyzeService {
 	return &AnalyzeService{
 		fetcher:     fetcher.New(cfg.RequestTimeout),
-		linkChecker: analyzer.NewLinkChecker(cfg.MaxLinkCheckWorkers, cfg.MaxLinksToCheck, cfg.RequestTimeout),
+		linkChecker: analyzer.NewLinkChecker(cfg.MaxLinkCheckWorkers, cfg.RequestTimeout),
 		repo:        repo,
 	}
 }

@@ -9,14 +9,12 @@ import (
 
 type LinkChecker struct {
 	maxWorkers int
-	maxLinks   int
 	client     *http.Client
 }
 
-func NewLinkChecker(maxWorkers, maxLinks int, timeout time.Duration) *LinkChecker {
+func NewLinkChecker(maxWorkers int, timeout time.Duration) *LinkChecker {
 	return &LinkChecker{
 		maxWorkers: maxWorkers,
-		maxLinks:   maxLinks,
 		client: &http.Client{
 			Timeout: timeout,
 			CheckRedirect: func(req *http.Request, via []*http.Request) error {
@@ -33,13 +31,8 @@ func (lc *LinkChecker) CheckLinks(ctx context.Context, urls []string) int {
 		return 0
 	}
 
-	toCheck := urls
-	if lc.maxLinks > 0 && len(toCheck) > lc.maxLinks {
-		toCheck = toCheck[:lc.maxLinks]
-	}
-
-	jobs := make(chan string, len(toCheck))
-	for _, u := range toCheck {
+	jobs := make(chan string, len(urls))
+	for _, u := range urls {
 		jobs <- u
 	}
 	close(jobs)
@@ -49,8 +42,8 @@ func (lc *LinkChecker) CheckLinks(ctx context.Context, urls []string) int {
 
 	var wg sync.WaitGroup
 	workers := lc.maxWorkers
-	if workers > len(toCheck) {
-		workers = len(toCheck)
+	if workers > len(urls) {
+		workers = len(urls)
 	}
 
 	for i := 0; i < workers; i++ {

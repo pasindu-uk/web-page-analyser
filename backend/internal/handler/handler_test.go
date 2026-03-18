@@ -18,7 +18,6 @@ func setupHandler() (*Handler, *http.ServeMux) {
 		Port:                8080,
 		RequestTimeout:      5 * time.Second,
 		MaxLinkCheckWorkers: 2,
-		MaxLinksToCheck:     10,
 		LogLevel:            "info",
 	}
 	svc := service.New(cfg, nil)

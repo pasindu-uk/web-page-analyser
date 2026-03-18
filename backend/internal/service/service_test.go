@@ -15,7 +15,6 @@ func testConfig() *config.Config {
 		Port:                8080,
 		RequestTimeout:      5 * time.Second,
 		MaxLinkCheckWorkers: 2,
-		MaxLinksToCheck:     10,
 		LogLevel:            "info",
 	}
 }
