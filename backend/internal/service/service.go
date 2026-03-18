@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/url"
+	"sync"
 
 	"github.com/pasindu-uk/web-page-analyser/internal/analyzer"
 	"github.com/pasindu-uk/web-page-analyser/internal/fetcher"
@@ -26,6 +27,7 @@ type AnalyzeService struct {
 	fetcher     PageFetcher
 	linkChecker LinkChecker
 	repo        repository.Repository
+	wg          sync.WaitGroup
 }
 
 func New(f PageFetcher, lc LinkChecker, repo repository.Repository) *AnalyzeService {
@@ -89,7 +91,9 @@ func (s *AnalyzeService) Analyze(ctx context.Context, rawURL string) (*model.Ana
 	}
 
 	if s.repo != nil {
+		s.wg.Add(1)
 		go func() {
+			defer s.wg.Done()
 			if err := s.repo.Save(context.Background(), resp); err != nil {
 				slog.Error("failed to persist analysis", "error", err)
 			}
@@ -98,6 +102,9 @@ func (s *AnalyzeService) Analyze(ctx context.Context, rawURL string) (*model.Ana
 
 	return resp, nil
 }
+
+// Wait blocks until all background persistence goroutines complete.
+func (s *AnalyzeService) Wait() { s.wg.Wait() }
 
 // ListAnalyses returns stored analysis history. Returns nil, nil if persistence is not configured.
 func (s *AnalyzeService) ListAnalyses(ctx context.Context) ([]model.AnalyzeResponse, error) {

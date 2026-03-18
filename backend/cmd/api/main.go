@@ -83,4 +83,5 @@ func main() {
 	if err := srv.Shutdown(ctx); err != nil {
 		slog.Error("server forced to shutdown", "error", err)
 	}
+	svc.Wait()
 }

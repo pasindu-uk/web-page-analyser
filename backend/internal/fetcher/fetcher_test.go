@@ -16,7 +16,7 @@ func TestFetch_Success(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	f := New(5 * time.Second)
+	f := New(5*time.Second, WithAllowPrivateIPs())
 	result, err := f.Fetch(context.Background(), srv.URL)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -42,7 +42,7 @@ func TestFetch_NonHTMLContentType(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	f := New(5 * time.Second)
+	f := New(5*time.Second, WithAllowPrivateIPs())
 	_, err := f.Fetch(context.Background(), srv.URL)
 	if err == nil {
 		t.Fatal("expected error for non-HTML content type")
@@ -65,7 +65,7 @@ func TestFetch_HTTPError(t *testing.T) {
 			}))
 			defer srv.Close()
 
-			f := New(5 * time.Second)
+			f := New(5*time.Second, WithAllowPrivateIPs())
 			_, err := f.Fetch(context.Background(), srv.URL)
 			if err == nil {
 				t.Fatal("expected error")
@@ -88,7 +88,7 @@ func TestFetch_Timeout(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	f := New(100 * time.Millisecond)
+	f := New(100*time.Millisecond, WithAllowPrivateIPs())
 	_, err := f.Fetch(context.Background(), srv.URL)
 	if err == nil {
 		t.Fatal("expected timeout error")
@@ -107,7 +107,7 @@ func TestFetch_Redirect(t *testing.T) {
 	}))
 	defer redirect.Close()
 
-	f := New(5 * time.Second)
+	f := New(5*time.Second, WithAllowPrivateIPs())
 	result, err := f.Fetch(context.Background(), redirect.URL)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -119,5 +119,30 @@ func TestFetch_Redirect(t *testing.T) {
 		if result.FinalURL == redirect.URL || result.FinalURL == redirect.URL+"/" {
 			t.Errorf("expected redirect to final URL, got %s", result.FinalURL)
 		}
+	}
+}
+
+func TestFetch_BlocksPrivateIPs(t *testing.T) {
+	// Without WithAllowPrivateIPs, the fetcher should block private IPs.
+	f := New(5 * time.Second)
+
+	tests := []struct {
+		name string
+		url  string
+	}{
+		{"loopback", "http://127.0.0.1/"},
+		{"loopback v6", "http://[::1]/"},
+		{"private 10.x", "http://10.0.0.1/"},
+		{"private 192.168.x", "http://192.168.1.1/"},
+		{"link-local", "http://169.254.169.254/"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := f.Fetch(context.Background(), tt.url)
+			if err == nil {
+				t.Fatal("expected SSRF protection to block request")
+			}
+		})
 	}
 }

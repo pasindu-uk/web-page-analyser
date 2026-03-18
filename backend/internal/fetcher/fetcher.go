@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"strings"
 	"time"
@@ -14,16 +15,63 @@ type Result struct {
 	FinalURL string
 }
 
+// Option configures a Fetcher.
+type Option func(*Fetcher)
+
+// WithAllowPrivateIPs disables the SSRF protection that blocks requests to
+// private/loopback IP addresses. Use this only in tests with httptest servers.
+func WithAllowPrivateIPs() Option {
+	return func(f *Fetcher) {
+		f.client.Transport = nil // use default transport
+	}
+}
+
 type Fetcher struct {
 	client *http.Client
 }
 
-func New(timeout time.Duration) *Fetcher {
-	return &Fetcher{
+func New(timeout time.Duration, opts ...Option) *Fetcher {
+	f := &Fetcher{
 		client: &http.Client{
-			Timeout: timeout,
+			Timeout:   timeout,
+			Transport: &http.Transport{DialContext: safeDialContext},
 		},
 	}
+	for _, opt := range opts {
+		opt(f)
+	}
+	return f
+}
+
+// isPrivateIP returns true if the IP is loopback, private, link-local, or unspecified.
+func isPrivateIP(ip net.IP) bool {
+	return ip.IsLoopback() ||
+		ip.IsPrivate() ||
+		ip.IsLinkLocalUnicast() ||
+		ip.IsLinkLocalMulticast() ||
+		ip.IsUnspecified()
+}
+
+// safeDialContext resolves the address and rejects connections to private IPs.
+func safeDialContext(ctx context.Context, network, addr string) (net.Conn, error) {
+	host, port, err := net.SplitHostPort(addr)
+	if err != nil {
+		return nil, fmt.Errorf("invalid address %q: %w", addr, err)
+	}
+
+	ips, err := net.DefaultResolver.LookupIPAddr(ctx, host)
+	if err != nil {
+		return nil, fmt.Errorf("DNS lookup failed for %q: %w", host, err)
+	}
+
+	for _, ipAddr := range ips {
+		if isPrivateIP(ipAddr.IP) {
+			return nil, fmt.Errorf("request to private IP %s is blocked (SSRF protection)", ipAddr.IP)
+		}
+	}
+
+	var d net.Dialer
+	return d.DialContext(ctx, network, net.JoinHostPort(host, port))
 }
 
 func (f *Fetcher) Fetch(ctx context.Context, url string) (*Result, error) {

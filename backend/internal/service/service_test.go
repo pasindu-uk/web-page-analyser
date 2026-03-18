@@ -12,7 +12,7 @@ import (
 )
 
 func testService() *AnalyzeService {
-	f := fetcher.New(5 * time.Second)
+	f := fetcher.New(5*time.Second, fetcher.WithAllowPrivateIPs())
 	lc := analyzer.NewLinkChecker(2, 5*time.Second)
 	return New(f, lc, nil)
 }

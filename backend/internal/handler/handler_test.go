@@ -15,7 +15,7 @@ import (
 )
 
 func setupHandler() (*Handler, *http.ServeMux) {
-	f := fetcher.New(5 * time.Second)
+	f := fetcher.New(5*time.Second, fetcher.WithAllowPrivateIPs())
 	lc := analyzer.NewLinkChecker(2, 5*time.Second)
 	svc := service.New(f, lc, nil)
 	h := New(svc)
