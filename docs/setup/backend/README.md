@@ -47,7 +47,6 @@ Edit `.env.local` with your preferred settings:
 PORT=8080
 REQUEST_TIMEOUT=10s
 MAX_LINK_CHECK_WORKERS=5
-MAX_LINKS_TO_CHECK=50
 LOG_LEVEL=info
 MYSQL_DSN=
 ```
@@ -61,7 +60,6 @@ The backend automatically reads `.env.local` first, then falls back to `.env`. E
 | `PORT` | `8080` | Port the HTTP server listens on |
 | `REQUEST_TIMEOUT` | `10s` | Timeout for fetching remote pages (Go duration format, e.g., `10s`, `30s`) |
 | `MAX_LINK_CHECK_WORKERS` | `5` | Number of goroutines in the link checker worker pool |
-| `MAX_LINKS_TO_CHECK` | `50` | Maximum links to verify per analysis |
 | `LOG_LEVEL` | `info` | Logging level: `debug`, `info`, `warn`, `error` |
 | `MYSQL_DSN` | _(empty)_ | MySQL connection string (see Step 5) |
 
@@ -231,8 +229,7 @@ mysql -u root -p -h 127.0.0.1 -P 3306
 
 ### Slow link checking
 
-Increase the worker pool size or reduce the link cap:
+Increase the worker pool size:
 ```env
 MAX_LINK_CHECK_WORKERS=10
-MAX_LINKS_TO_CHECK=20
 ```

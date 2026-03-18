@@ -47,18 +47,20 @@ sequenceDiagram
 graph TD
     Main[cmd/api/main.go] --> Config[config]
     Main --> Logger[logger]
+    Main --> Fetcher[fetcher]
+    Main --> LC[linkchecker]
     Main --> Repo[repository]
     Main --> Cache[cache]
     Main --> Service[service]
     Main --> Handler[handler]
 
     Handler --> Service
-    Service --> Fetcher[fetcher]
+    Service --> Fetcher
+    Service --> LC
     Service --> Analyzer[analyzer]
     Service --> Cache
 
     Cache --> Repo
-    Analyzer --> LC[linkchecker]
 
     Handler --> Model[model]
     Service --> Model
@@ -208,7 +210,6 @@ Visit `http://localhost:5173` in your browser, enter a URL, and click **Analyze*
 | `PORT` | `8080` | Server port |
 | `REQUEST_TIMEOUT` | `10s` | HTTP client timeout for fetching pages |
 | `MAX_LINK_CHECK_WORKERS` | `5` | Concurrent link checker goroutines |
-| `MAX_LINKS_TO_CHECK` | `50` | Maximum number of links to verify |
 | `MYSQL_DSN` | _(empty)_ | MySQL connection string (optional) |
 | `LOG_LEVEL` | `info` | Logging level (`debug`, `info`, `warn`, `error`) |
 
