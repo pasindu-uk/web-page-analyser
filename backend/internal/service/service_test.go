@@ -7,20 +7,18 @@ import (
 	"testing"
 	"time"
 
-	"github.com/pasindu-uk/web-page-analyser/internal/config"
+	"github.com/pasindu-uk/web-page-analyser/internal/analyzer"
+	"github.com/pasindu-uk/web-page-analyser/internal/fetcher"
 )
 
-func testConfig() *config.Config {
-	return &config.Config{
-		Port:                8080,
-		RequestTimeout:      5 * time.Second,
-		MaxLinkCheckWorkers: 2,
-		LogLevel:            "info",
-	}
+func testService() *AnalyzeService {
+	f := fetcher.New(5 * time.Second)
+	lc := analyzer.NewLinkChecker(2, 5*time.Second)
+	return New(f, lc, nil)
 }
 
 func TestAnalyze_ValidationErrors(t *testing.T) {
-	svc := New(testConfig(), nil)
+	svc := testService()
 
 	tests := []struct {
 		name string
@@ -67,7 +65,7 @@ func TestAnalyze_FullFlow(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	svc := New(testConfig(), nil)
+	svc := testService()
 	resp, err := svc.Analyze(context.Background(), srv.URL)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)

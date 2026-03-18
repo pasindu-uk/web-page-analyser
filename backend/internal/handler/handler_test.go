@@ -8,19 +8,16 @@ import (
 	"testing"
 	"time"
 
-	"github.com/pasindu-uk/web-page-analyser/internal/config"
+	"github.com/pasindu-uk/web-page-analyser/internal/analyzer"
+	"github.com/pasindu-uk/web-page-analyser/internal/fetcher"
 	"github.com/pasindu-uk/web-page-analyser/internal/model"
 	"github.com/pasindu-uk/web-page-analyser/internal/service"
 )
 
 func setupHandler() (*Handler, *http.ServeMux) {
-	cfg := &config.Config{
-		Port:                8080,
-		RequestTimeout:      5 * time.Second,
-		MaxLinkCheckWorkers: 2,
-		LogLevel:            "info",
-	}
-	svc := service.New(cfg, nil)
+	f := fetcher.New(5 * time.Second)
+	lc := analyzer.NewLinkChecker(2, 5*time.Second)
+	svc := service.New(f, lc, nil)
 	h := New(svc)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)

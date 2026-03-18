@@ -7,22 +7,31 @@ import (
 	"net/url"
 
 	"github.com/pasindu-uk/web-page-analyser/internal/analyzer"
-	"github.com/pasindu-uk/web-page-analyser/internal/config"
 	"github.com/pasindu-uk/web-page-analyser/internal/fetcher"
 	"github.com/pasindu-uk/web-page-analyser/internal/model"
 	"github.com/pasindu-uk/web-page-analyser/internal/repository"
 )
 
+// PageFetcher abstracts page fetching for testability.
+type PageFetcher interface {
+	Fetch(ctx context.Context, url string) (*fetcher.Result, error)
+}
+
+// LinkChecker abstracts concurrent link accessibility checking.
+type LinkChecker interface {
+	CheckLinks(ctx context.Context, urls []string) int
+}
+
 type AnalyzeService struct {
-	fetcher     *fetcher.Fetcher
-	linkChecker *analyzer.LinkChecker
+	fetcher     PageFetcher
+	linkChecker LinkChecker
 	repo        repository.Repository
 }
 
-func New(cfg *config.Config, repo repository.Repository) *AnalyzeService {
+func New(f PageFetcher, lc LinkChecker, repo repository.Repository) *AnalyzeService {
 	return &AnalyzeService{
-		fetcher:     fetcher.New(cfg.RequestTimeout),
-		linkChecker: analyzer.NewLinkChecker(cfg.MaxLinkCheckWorkers, cfg.RequestTimeout),
+		fetcher:     f,
+		linkChecker: lc,
 		repo:        repo,
 	}
 }

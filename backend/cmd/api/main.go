@@ -10,7 +10,9 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/pasindu-uk/web-page-analyser/internal/analyzer"
 	"github.com/pasindu-uk/web-page-analyser/internal/config"
+	"github.com/pasindu-uk/web-page-analyser/internal/fetcher"
 	"github.com/pasindu-uk/web-page-analyser/internal/handler"
 	"github.com/pasindu-uk/web-page-analyser/internal/logger"
 	"github.com/pasindu-uk/web-page-analyser/internal/repository"
@@ -38,7 +40,9 @@ func main() {
 		repo = repository.NewCached(mysqlRepo)
 	}
 
-	svc := service.New(cfg, repo)
+	f := fetcher.New(cfg.RequestTimeout)
+	lc := analyzer.NewLinkChecker(cfg.MaxLinkCheckWorkers, cfg.RequestTimeout)
+	svc := service.New(f, lc, repo)
 	h := handler.New(svc)
 
 	mux := http.NewServeMux()
