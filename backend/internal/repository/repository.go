@@ -21,31 +21,10 @@ type MySQLRepository struct {
 	db *sql.DB
 }
 
-// NewMySQL opens a MySQL connection and returns a MySQLRepository.
-func NewMySQL(dsn string) (*MySQLRepository, error) {
-	db, err := sql.Open("mysql", dsn)
-	if err != nil {
-		return nil, fmt.Errorf("opening mysql: %w", err)
-	}
-	if err := db.Ping(); err != nil {
-		return nil, fmt.Errorf("pinging mysql: %w", err)
-	}
-	return &MySQLRepository{db: db}, nil
-}
-
-// NewMySQLFromDB wraps an existing *sql.DB connection.
-func NewMySQLFromDB(db *sql.DB) *MySQLRepository {
+// NewMySQL wraps an existing *sql.DB connection.
+// The caller owns the connection and is responsible for closing it.
+func NewMySQL(db *sql.DB) *MySQLRepository {
 	return &MySQLRepository{db: db}
-}
-
-// DB returns the underlying database connection for running migrations.
-func (r *MySQLRepository) DB() *sql.DB {
-	return r.db
-}
-
-// Close closes the underlying database connection.
-func (r *MySQLRepository) Close() error {
-	return r.db.Close()
 }
 
 func (r *MySQLRepository) Save(ctx context.Context, resp *model.AnalyzeResponse) error {

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 	"os"
 	"testing"
 
@@ -17,21 +18,24 @@ func setupTestDB(t *testing.T) *MySQLRepository {
 		t.Skip("MYSQL_DSN_TEST not set, skipping integration test")
 	}
 
-	repo, err := NewMySQL(dsn)
+	db, err := sql.Open("mysql", dsn)
 	if err != nil {
-		t.Fatalf("failed to connect to test db: %v", err)
+		t.Fatalf("failed to open test db: %v", err)
+	}
+	if err := db.Ping(); err != nil {
+		t.Fatalf("failed to ping test db: %v", err)
 	}
 
-	if err := RunMigrations(repo.DB()); err != nil {
+	if err := RunMigrations(db); err != nil {
 		t.Fatalf("failed to run migrations: %v", err)
 	}
 
-	// Clean table before each test
-	if _, err := repo.DB().Exec("DELETE FROM analyses"); err != nil {
+	if _, err := db.Exec("DELETE FROM analyses"); err != nil {
 		t.Fatalf("failed to clean table: %v", err)
 	}
 
-	t.Cleanup(func() { repo.Close() })
+	repo := NewMySQL(db)
+	t.Cleanup(func() { db.Close() })
 	return repo
 }
 

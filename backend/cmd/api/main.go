@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -9,6 +10,8 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/pasindu-uk/web-page-analyser/internal/analyzer"
 	"github.com/pasindu-uk/web-page-analyser/internal/config"
@@ -25,19 +28,23 @@ func main() {
 
 	var repo repository.Repository
 	if cfg.MySQLDSN != "" {
-		mysqlRepo, err := repository.NewMySQL(cfg.MySQLDSN)
+		db, err := sql.Open("mysql", cfg.MySQLDSN)
 		if err != nil {
-			slog.Error("failed to connect to MySQL", "error", err)
+			slog.Error("failed to open MySQL", "error", err)
 			os.Exit(1)
 		}
-		defer mysqlRepo.Close()
+		if err := db.Ping(); err != nil {
+			slog.Error("failed to ping MySQL", "error", err)
+			os.Exit(1)
+		}
+		defer db.Close()
 
-		if err := repository.RunMigrations(mysqlRepo.DB()); err != nil {
+		if err := repository.RunMigrations(db); err != nil {
 			slog.Error("failed to run migrations", "error", err)
 			os.Exit(1)
 		}
 		slog.Info("MySQL persistence enabled")
-		repo = repository.NewCached(mysqlRepo)
+		repo = repository.NewCached(repository.NewMySQL(db))
 	}
 
 	f := fetcher.New(cfg.RequestTimeout)
